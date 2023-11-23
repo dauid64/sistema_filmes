@@ -163,3 +163,7 @@ CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+
+CSRF_TRUSTED_ORIGINS = [
+    x for x in str(os.getenv('CSRFF_TRUSTED_ORIGINS')).split(', ')
+]
