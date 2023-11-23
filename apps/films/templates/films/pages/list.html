@@ -1,0 +1,30 @@
+{% extends "global/base.html" %}
+
+{% block title %}Listar Filmes{% endblock title %}
+
+{% block content %}
+    <h1 class="text-center">Seus Filmes</h1>
+    <div class="row">
+        {% for film in films %}
+            <div class="col">
+                <div class="card mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                    <h5 class="card-title">{{ film.name }}</h5>
+                    <p class="card-text">{{ film.description }}</p>
+                    {% if film.would_like %}
+                        <button class="btn btn-primary">Gostaria de Assistir!</button>
+                    {% else %}
+                        <button type="button" class="btn btn-success">Assistido!</button>
+                    {% endif %}
+                        <a class="btn btn-secondary" href="{% url 'films:edit' film.pk %}">Editar</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            {% include "global/partials/pagination.html" with page_obj=films %}
+        </div>
+    </div>
+{% endblock content %}

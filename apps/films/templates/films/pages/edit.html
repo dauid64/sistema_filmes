@@ -1,0 +1,14 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block title %}Editar Filme{% endblock title %}
+
+{% block content %}
+    {% include "global/partials/form.html" with btn_text="Editar" %}
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{% static "films/plugin/jquery.mask.js" %}"></script>
+    <script src="{% static "films/js/form_mask.js" %}"></script>
+    <script src="{% static "films/js/disable_date.js" %}"></script>
+{% endblock scripts %}

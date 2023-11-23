@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "global/partials/head.html" %}
+    <title>{% block title %}{% endblock title %}</title>
+</head>
+<body>
+    {% if request.user.is_authenticated %}
+        {% include "global/partials/header.html" %}
+    {% endif %}
+    {% include "global/partials/message.html" %}
+    <div class="container">
+        {% block content %}{% endblock content %}
+    </div>
+
+    {% include "global/partials/scripts.html" %}
+    {% block scripts %}{% endblock scripts %}
+</body>
+</html>
