@@ -1,5 +1,5 @@
-from typing import Any
-from .models import Film
+from .models import Film, FilmExportRequest
+from .tasks import export_films_excel
 from django.views.generic import ListView, CreateView, \
     UpdateView, View
 from django.http import JsonResponse
@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.core.paginator import Paginator
-import xlwt
 
 
 @method_decorator(
@@ -99,29 +98,10 @@ class ReportFilms(View):
 )
 class ExportFilms(View):
     def get(self, request):
+        export_request = FilmExportRequest.objects.create(
+            user=request.user)
+        export_films_excel.apply_async([export_request.id])
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="relatorio.xls"'
-
-        wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet('Filmes')
-
-        row_num = 0
-
-        columns = ['Id', 'Nome', 'Descrição', 'Gostaria de Assistir']
-
-        for col_num in range(len(columns)):
-            ws.write(row_num, col_num, columns[col_num])
-
-        films = Film.objects.filter(user=request.user)
-
-        row_num = 1
-        for film in films:
-            ws.write(row_num, 0, film.id)
-            ws.write(row_num, 1, film.name)
-            ws.write(row_num, 2, film.description)
-            ws.write(row_num, 3,
-                     'Gostaria' if film.would_like is True else 'Assistido')
-            row_num += 1
-
-        wb.save(response)
+        response.write(export_request.report)
         return response
