@@ -25,6 +25,11 @@ urlpatterns = [
         name='report'
     ),
     path(
+        'prepare-export-excel',
+        views.PrepareExportFilms.as_view(),
+        name='prepare_export_excel'
+    ),
+    path(
         'export-excel',
         views.ExportFilms.as_view(),
         name='export_excel'

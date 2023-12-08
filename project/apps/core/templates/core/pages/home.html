@@ -6,7 +6,14 @@
 {% block content %}
 <h1 class="text-center">Relatório</h1>
 <div class="d-flex justify-content-center">
-    <a href="{% url 'films:export_excel' %}" class="btn btn-primary">Exportar Excel</a>
+    <a href="{% url 'films:prepare_export_excel' %}" class="btn btn-primary">Preparar Excel</a>
+    {% if task_id %}
+        <form action="{% url 'films:export_excel' %}" method="GET">
+            <input type="hidden" value="{{ task_id }}">
+            <input type="hidden" value="{{ export_request_id }}">
+            <button type="submit" class="btn btn-success">Exportar Excel</button>
+        </form>
+    {% endif %}
 </div>
 <div class="row">
     <div class="col d-flex justify-content-center">

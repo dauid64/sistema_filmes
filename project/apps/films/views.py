@@ -1,9 +1,11 @@
 from .models import Film, FilmExportRequest
 from .tasks import export_films_excel
+from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, \
     UpdateView, View
 from django.http import JsonResponse
 from .forms import FilmForm
+from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -96,12 +98,47 @@ class ReportFilms(View):
     login_required(login_url='authentication:login', redirect_field_name='next'),
     name='dispatch'
 )
-class ExportFilms(View):
+class PrepareExportFilms(View):
     def get(self, request):
         export_request = FilmExportRequest.objects.create(
             user=request.user)
-        export_films_excel.apply_async([export_request.id])
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="relatorio.xls"'
-        response.write(export_request.report)
-        return response
+        result = export_films_excel.apply_async([export_request.id])
+        messages.warning(
+            request,
+            'O processamento do seu formulário está em andamento. Um botão de exportação será exibido assim que estiver concluído.'
+        )
+        request.session['task_id'] = result.id
+        request.session['export_request_id'] = export_request.id
+        return redirect(
+            'core:home'
+        )
+
+
+@method_decorator(
+    login_required(login_url='authentication:login', redirect_field_name='next'),
+    name='dispatch'
+)
+class ExportFilms(View):
+    def get(self, request):
+        task_pk = request.session.get('task_id', None)
+        export_request_id = request.session.get('export_request_id', None)
+
+        result = export_films_excel.AsyncResult(task_pk)
+
+        if result.successful():
+            del (request.session['task_id'])
+            del (request.session['export_request_id'])
+            export_request = FilmExportRequest.objects.get(
+                pk=export_request_id)
+            with open(export_request.report.path, 'rb') as file:
+                response = HttpResponse(
+                    file.read(),
+                    content_type='application/ms-excel'
+                )
+                response['Content-Disposition'] = 'attachment; filename="relatorio.xls"'
+                return response
+        else:
+            messages.warning(request, 'Seu formulário ainda está sendo processado...')
+            return redirect(
+                'core:home'
+            )

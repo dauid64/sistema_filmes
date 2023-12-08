@@ -1,6 +1,7 @@
 from celery import shared_task
 from django.utils import timezone
 from .models import FilmExportRequest, Film
+import io
 import xlwt
 
 
@@ -30,5 +31,12 @@ def export_films_excel(film_export_request_id):
             'Gostaria' if film.would_like is True else 'Assistido'
         )
         row_num += 1
+    
+    output = io.BytesIO()
+    wb.save(output)
+
+    film_export_request.report.save(
+        f'films_{film_export_request.user.username}.xlsx', output
+    )
     film_export_request.finished_at = timezone.now()
     film_export_request.save()
