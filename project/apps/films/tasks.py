@@ -31,7 +31,7 @@ def export_films_excel(film_export_request_id):
         ws.write(row_num, 2, film.description)
         ws.write(
             row_num, 3,
-            'Gostaria' if film.would_like is True else 'Assistido'
+            'Sim' if film.would_like is True else 'Assistido'
         )
         row_num += 1
 
@@ -59,7 +59,7 @@ def import_excel_to_films(import_request_id):
     df['gostaria_de_assistir'] = df['gostaria_de_assistir'].replace(
         {
             'assistido': False,
-            'gostaria': True
+            'sim': True
         }
     )
 
@@ -72,5 +72,5 @@ def import_excel_to_films(import_request_id):
             name=getattr(row, 'nome'),
             description=getattr(row, 'descricao'),
             assisted_in=getattr(row, 'assistido_em', None),
-            would_like=getattr(row, 'gostaria_de_assistir')
+            would_like=getattr(row, 'gostaria_de_assistir', False)
         )

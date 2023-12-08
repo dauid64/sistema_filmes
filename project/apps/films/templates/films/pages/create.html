@@ -7,6 +7,11 @@
     <form class="mt-2" method="POST" action="{% url 'films:import_excel' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <input required type="file" name="excel_file" class="form-control">
+        <div class="form-text">  
+            Insira os seguintes nomes nas colunas do Excel: "Nome", "Descrição", "Assistido em", "Gostaria de assistir". 
+            Por exemplo, se já assistiu, coloque "assistido" na coluna "Gostaria de assistir" e a data em "Assistido em"; 
+            caso contrário, insira apenas "sim" na coluna "Gostaria de assistir".
+        </div>
         <button type="submit" class="btn btn-secondary">Importar por Excel</button>
     </form>
 
