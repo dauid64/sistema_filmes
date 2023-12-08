@@ -1,5 +1,5 @@
-from .models import Film, FilmExportRequest
-from .tasks import export_films_excel
+from .models import Film, FilmExportRequest, FilmImportRequest
+from .tasks import export_films_excel, import_excel_to_films
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, \
     UpdateView, View
@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 
 @method_decorator(
@@ -142,3 +143,22 @@ class ExportFilms(View):
             return redirect(
                 'core:home'
             )
+
+
+@method_decorator(
+    login_required(login_url='authentication:login', redirect_field_name='next'),
+    name='dispatch'
+)
+class ImportExcel(View):
+    def post(self, request):
+        excel_file = request.FILES['excel_file']
+        import_request = FilmImportRequest.objects.create(
+            user=request.user,
+            report=excel_file,
+            created_at=timezone.now()
+        )
+        import_excel_to_films.apply_async([import_request.id])
+        messages.success(request, 'Seus filmes estão sendo criados!')
+        return redirect(
+            'films:create'
+        )

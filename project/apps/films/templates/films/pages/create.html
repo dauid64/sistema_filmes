@@ -4,6 +4,12 @@
 {% block title %}Cadastrar Filme{% endblock title %}
 
 {% block content %}
+    <form class="mt-2" method="POST" action="{% url 'films:import_excel' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input required type="file" name="excel_file" class="form-control">
+        <button type="submit" class="btn btn-secondary">Importar por Excel</button>
+    </form>
+
     {% include "global/partials/form.html" with btn_text="Cadastrar" %}
 {% endblock content %}
 

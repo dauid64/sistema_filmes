@@ -33,5 +33,10 @@ urlpatterns = [
         'export-excel',
         views.ExportFilms.as_view(),
         name='export_excel'
+    ),
+    path(
+        'import-excel',
+        views.ImportExcel.as_view(),
+        name='import_excel'
     )
 ]

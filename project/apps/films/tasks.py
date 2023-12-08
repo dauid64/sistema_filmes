@@ -1,7 +1,10 @@
 from celery import shared_task
 from django.utils import timezone
-from .models import FilmExportRequest, Film
+from .models import FilmExportRequest, Film, FilmImportRequest
+from django.contrib.auth.models import User
+from unidecode import unidecode
 import io
+import pandas as pd
 import xlwt
 
 
@@ -31,7 +34,7 @@ def export_films_excel(film_export_request_id):
             'Gostaria' if film.would_like is True else 'Assistido'
         )
         row_num += 1
-    
+
     output = io.BytesIO()
     wb.save(output)
 
@@ -40,3 +43,37 @@ def export_films_excel(film_export_request_id):
     )
     film_export_request.finished_at = timezone.now()
     film_export_request.save()
+
+
+@shared_task
+def import_excel_to_films(import_request_id):
+    import_request = FilmImportRequest.objects.get(pk=import_request_id)
+    user = import_request.user
+
+    df = pd.read_excel(import_request.report.path)
+
+    df.columns = [unidecode(col.lower().replace(' ', '_')) for col in df.columns]
+
+    df['gostaria_de_assistir'] = df['gostaria_de_assistir'].apply(lambda x: x.lower())
+
+    df['gostaria_de_assistir'] = df['gostaria_de_assistir'].replace(
+        {
+            'assistido': False,
+            'gostaria': True
+        }
+    )
+
+    # df['assistido_em'] = pd.to_datetime(df['assistido_em'], format='%d/%m/%Y', errors='coerce')
+    df['assistido_em'] = df['assistido_em'].replace({pd.NaT: None})
+
+
+    print(df)
+
+    for row in df.itertuples(index=False):
+        Film.objects.create(
+            user=user,
+            name=getattr(row, 'nome'),
+            description=getattr(row, 'descricao'),
+            assisted_in=getattr(row, 'assistido_em', None),
+            would_like=getattr(row, 'gostaria_de_assistir')
+        )
