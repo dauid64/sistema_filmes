@@ -1,4 +1,4 @@
-# Protótipo do Diretório Piloto de Jornalistas no Brasil
+# Sistema Filmes
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/dauid64/sistema_filmes?style=for-the-badge)
 ![GitHub language count](https://img.shields.io/github/languages/count/dauid64/sistema_filmes?style=for-the-badge)
@@ -28,9 +28,9 @@ Antes de começar, verifique se você atendeu aos seguintes requisitos:
 - Você instalou a versão mais recente de `< Python / Docker >`
 - Você tem uma máquina `< Windows / Linux / Mac >`
 
-## ☕ Usando DPJB
+## ☕ Usando o Sistema Filmes
 
-Para usar o DPJB, siga estas etapas:
+Para usar o Sistema Filmes, siga estas etapas:
 
 * Primeiramente, você precisa acessar a pasta "dotenv_files", copiar o arquivo ".env-examples" para a mesma pasta com o nome ".env" e configurar as variáveis de ambiente conforme o exemplo fornecido.
 
