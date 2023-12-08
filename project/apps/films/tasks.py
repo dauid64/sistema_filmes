@@ -66,9 +66,6 @@ def import_excel_to_films(import_request_id):
     # df['assistido_em'] = pd.to_datetime(df['assistido_em'], format='%d/%m/%Y', errors='coerce')
     df['assistido_em'] = df['assistido_em'].replace({pd.NaT: None})
 
-
-    print(df)
-
     for row in df.itertuples(index=False):
         Film.objects.create(
             user=user,
